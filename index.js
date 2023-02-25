@@ -3,26 +3,21 @@
  * @param {Boolean} overrideNativeDate Determines whether to override the native Date class.
  */
 module.exports = function initialize(overrideNativeDate=true) {
-  const MONTHS_1Y = 12;
-  const DAYS_1Y = 365;
-  const DAYS_1LeapY = 366;
-  const DAYS_1M = 30;
-  const MS_1S = 1000;
-  const MS_1MIN = 60000;
-  const MS_1H = 3600000;
-  const MS_1D = 86400000;
-  const MS_1W = 604800000;
-  const MS_1M = DAYS_1M * MS_1D;
-  const MS_1Y = DAYS_1Y * MS_1D;
-  const MS_1LeapY = DAYS_1LeapY * MS_1D;
-  const DATE_REGEX = /^(0{0,}[0-9]{1,})(?:-(0?[1-9]|1[012]))(?:-(0[1-9]|[12][0-9]|3[01]))$/;
-  const TIME_REGEX = /^([01]?\d|[0-3]):([0-5]?\d)(?::([0-5]?\d)(?:\.(\d{0,}))?)?$/;
+  const MONTHS_1Y   = 12;
+  const MS_1Sec     = 1e3;
+  const MS_1Min     = 60 * MS_1Sec;
+  const MS_1Hour    = 60 * MS_1Min;
+  const MS_1Day     = 24 * MS_1Hour;
+  const MS_1Week    = 07 * MS_1Day;
+  const EPOCH_DATE  = '1970-01-01';
+  const DATE_REGEX  = /^(0{0,}[0-9]{1,})(?:-(0?[1-9]|1[012]))(?:-(0[1-9]|[12][0-9]|3[01]))$/;
+  const TIME_REGEX  = /^([01]?\d|[0-3]):([0-5]?\d)(?::([0-5]?\d)(?:\.(\d{0,}))?)?$/;
 
   /**
    * @param {SuperDate} date
    */
   const correction = (date) => {
-    const offset = date.getTimezoneOffset() * MS_1MIN;
+    const offset = date.getTimezoneOffset() * MS_1Min;
     return date.addMs(offset);
   }
 
@@ -56,7 +51,7 @@ module.exports = function initialize(overrideNativeDate=true) {
             const m = timeMatch[2];
             const s = timeMatch[3] || '0';
             const ms = timeMatch[4] || '0';
-            super(`1970-1-1 ${h}:${m}:${s}.${ms}`);
+            super(`${EPOCH_DATE} ${h}:${m}:${s}.${ms}`);
             return correction(this);
           }
         }
@@ -86,31 +81,31 @@ module.exports = function initialize(overrideNativeDate=true) {
    * Returns the number of seconds elapsed since January 1, 1970, 00:00:00 UTC.
    * @returns {number} The number of seconds elapsed since January 1, 1970, 00:00:00 UTC.
    */
-  SuperDate.prototype.toSecs = function() {return this.toMs() / MS_1S}
+  SuperDate.prototype.toSecs = function() {return this.toMs() / MS_1Sec}
   
   /**
    * Returns the number of minutes elapsed since January 1, 1970, 00:00:00 UTC.
    * @returns {number} The number of minutes elapsed since January 1, 1970, 00:00:00 UTC.
    */
-  SuperDate.prototype.toMins = function() {return this.toMs() / MS_1MIN}
+  SuperDate.prototype.toMins = function() {return this.toMs() / MS_1Min}
   
   /**
    * Returns the number of hours elapsed since January 1, 1970, 00:00:00 UTC.
    * @returns {number} The number of hours elapsed since January 1, 1970, 00:00:00 UTC.
    */
-  SuperDate.prototype.toHours = function() {return this.toMs() / MS_1H}
+  SuperDate.prototype.toHours = function() {return this.toMs() / MS_1Hour}
   
   /**
    * Returns the number of days elapsed since January 1, 1970, 00:00:00 UTC.
    * @returns {number} The number of days elapsed since January 1, 1970, 00:00:00 UTC.
    */
-  SuperDate.prototype.toDays = function() {return this.toMs() / MS_1D}
+  SuperDate.prototype.toDays = function() {return this.toMs() / MS_1Day}
   
   /**
    * Returns the number of weeks elapsed since January 1, 1970, 00:00:00 UTC.
    * @returns {number} The number of weeks elapsed since January 1, 1970, 00:00:00 UTC.
    */
-  SuperDate.prototype.toWeeks = function() {return this.toMs() / MS_1W}
+  SuperDate.prototype.toWeeks = function() {return this.toMs() / MS_1Week}
   
   /**
    * Returns the number of months elapsed since January 1, 1970, 00:00:00 UTC.
@@ -123,9 +118,9 @@ module.exports = function initialize(overrideNativeDate=true) {
    * @returns {number} The number of years elapsed since January 1, 1970, 00:00:00 UTC.
    */
   SuperDate.prototype.toYears = function() {
-    const y = this.getFullYear();
-    const thisYearMs = $(`${y}-01-01`).toMs();
-    return this.getYear() + ((this.toMs() - thisYearMs) / ($(`${y + 1}-01-01`).toMs() - thisYearMs));
+    const thisYear = this.getFullYear();
+    const thisYearMs = $(`${thisYear}-01-01`).toMs();
+    return thisYear - $(0).getFullYear() + ((this.toMs() - thisYearMs) / ($(`${thisYear + 1}-01-01`).toMs() - thisYearMs));
   }
 
   /**
@@ -147,35 +142,35 @@ module.exports = function initialize(overrideNativeDate=true) {
    * @param  {Number} secs
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.addSecs = function(secs) {return this.addMs(secs * MS_1S)}
+  SuperDate.prototype.addSecs = function(secs) {return this.addMs(secs * MS_1Sec)}
   
   /**
    * Add minutes to the current date.
    * @param  {Number} min
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.addMins = function(min) {return this.addMs(min * MS_1MIN)}
+  SuperDate.prototype.addMins = function(min) {return this.addMs(min * MS_1Min)}
   
   /**
    * Add hours to the current date.
    * @param  {Number} hours
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.addHours = function(hours) {return this.addMs(hours * MS_1H)}
+  SuperDate.prototype.addHours = function(hours) {return this.addMs(hours * MS_1Hour)}
   
   /**
    * Add days to the current date.
    * @param  {Number} days
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.addDays = function(days) {return this.addMs(days * MS_1D)}
+  SuperDate.prototype.addDays = function(days) {return this.addMs(days * MS_1Day)}
   
   /**
    * Add weeks to the current date.
    * @param  {Number} weeks
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.addWeeks = function(weeks) {return this.addMs(weeks * MS_1W)}
+  SuperDate.prototype.addWeeks = function(weeks) {return this.addMs(weeks * MS_1Week)}
   
   /**
    * Add months to the current date.
@@ -210,35 +205,35 @@ module.exports = function initialize(overrideNativeDate=true) {
    * @param  {Number} secs
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.diffSecs = function(secs) {return this.diffMs(secs * MS_1S)}
+  SuperDate.prototype.diffSecs = function(secs) {return this.diffMs(secs * MS_1Sec)}
   
   /**
    * Subtract minutes from the current date.
    * @param  {Number} min
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.diffMins = function(min) {return this.diffMs(min * MS_1MIN)}
+  SuperDate.prototype.diffMins = function(min) {return this.diffMs(min * MS_1Min)}
   
   /**
    * Subtract hours from the current date.
    * @param  {Number} hours
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.diffHours = function(hours) {return this.diffMs(hours * MS_1H)}
+  SuperDate.prototype.diffHours = function(hours) {return this.diffMs(hours * MS_1Hour)}
   
   /**
    * Subtract days from the current date.
    * @param  {Number} days
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.diffDays = function(days) {return this.diffMs(days * MS_1D)}
+  SuperDate.prototype.diffDays = function(days) {return this.diffMs(days * MS_1Day)}
   
   /**
    * Subtract weeks from the current date.
    * @param  {Number} weeks
    * @returns {SuperDate} The updated SuperDate Object.
    */
-  SuperDate.prototype.diffWeeks = function(weeks) {return this.diffMs(weeks * MS_1W)}
+  SuperDate.prototype.diffWeeks = function(weeks) {return this.diffMs(weeks * MS_1Week)}
   
   /**
    * Subtract months from the current date.
@@ -253,6 +248,26 @@ module.exports = function initialize(overrideNativeDate=true) {
    * @returns {SuperDate} The updated SuperDate Object.
    */
   SuperDate.prototype.diffYears = function(years) {return this.diffMonths(years * MONTHS_1Y)}
+
+  /**
+   * Determines whether the current year is leap year.
+   * @returns {Boolean}
+   */
+  SuperDate.prototype.isLeapYear = function() {
+    const year = y.getFullYear();
+    return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+  }
+
+  /**
+   * Determines whether the current date is between given dates.
+   * @param  {SuperDate|Date|Number|undefined} date
+   * @returns {Boolean}
+   */
+  SuperDate.prototype.isBetween = function(date1, date2) {
+    date1 = $(date1), date2 = $(date2);
+    if (date1 > date2) [date1, date2] = [date2, date1];
+    return Boolean(this > date1 && this < date2);
+  }
 
   /**
    * Determines whether the current date is before another date.
@@ -274,6 +289,20 @@ module.exports = function initialize(overrideNativeDate=true) {
    * @returns {Boolean}
    */
   SuperDate.prototype.isEqual = function(date) {return Boolean(this.toMs() === $(date).toMs())}
+
+  /**
+   * Determines whether the current date is equal or before to another date.
+   * @param  {SuperDate|Date|Number|undefined} date
+   * @returns {Boolean}
+   */
+  SuperDate.prototype.isEqualOrBefore = function(date) {return Boolean(this <= $(date))}
+
+  /**
+   * Determines whether the current date is equal or after to another date.
+   * @param  {SuperDate|Date|Number|undefined} date
+   * @returns {Boolean}
+   */
+  SuperDate.prototype.isEqualOrAfter = function(date) {return Boolean(this >= $(date))}
 
   /**
    * Gets the milliseconds of a Date, using local time.
@@ -471,15 +500,10 @@ module.exports = function initialize(overrideNativeDate=true) {
    * @eg const t1 = new Date(); const t2 = new Date('2020-01-01'); console.log(t1.relative(t2));
    */
   SuperDate.prototype.relative = function(date, unit) {
-    const diff = $(date).toMs() - this.toMs();
-    const isPast = diff < 0;
-    const s = diff / MS_1S;
-    const m = diff / MS_1MIN;
-    const h = diff / MS_1H;
-    const d = diff / MS_1D;
-    const w = diff / MS_1W
-    const M = diff / MS_1M;
-    const y = diff / MS_1Y;
+    const diffDate = $((date ? $() : $(date)).toMs() - this.toMs());
+    const isPast = diffDate.toMs() < 0;
+    const s = diffDate.toSecs(), m = diffDate.toMins(), h = diffDate.toHours(), d = diffDate.toDays(),
+    w = diffDate.toWeeks(), M = diffDate.toMonths(), y = diffDate.toYears();
     let value;
     if (y >= 1 && (!unit || unit === 'year')) {
       value = y, unit = 'year';
@@ -692,7 +716,7 @@ module.exports = function initialize(overrideNativeDate=true) {
       if (y < 1900 || y > 2100) return;
       if (y === 1900 && m === 1 && d < 31) return;
       let i, leap = 0, temp = 0,
-      offset = (Date.UTC(y, m - 1, d) - Date.UTC(1900, 0, 31)) / MS_1D;
+      offset = (Date.UTC(y, m - 1, d) - Date.UTC(1900, 0, 31)) / MS_1Day;
       for (i = 1900; i < 2101 && offset > 0; i++) temp = getLunarYearDays(i), offset -= temp;
       if (offset < 0) offset += temp, i--;
       const year = i;
@@ -720,7 +744,7 @@ module.exports = function initialize(overrideNativeDate=true) {
         gzMonth: (d >= firstNode
           ? toGanZhi((y - 1900) * 12 + m + 12)
           : toGanZhi((y - 1900) * 12 + m + 11)) || '',
-        gzDay: toGanZhi((Date.UTC(y, m - 1, 1, 0, 0, 0, 0) / MS_1D + 25567 + 10) + d - 1) || '',
+        gzDay: toGanZhi((Date.UTC(y, m - 1, 1, 0, 0, 0, 0) / MS_1Day + 25567 + 10) + d - 1) || '',
         solarTerm: solarTerm || '',
         zodiacSign: toZodiacSign(m, d) || ''
       };

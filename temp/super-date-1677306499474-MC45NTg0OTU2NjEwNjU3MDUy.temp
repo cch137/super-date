@@ -1,8 +1,4 @@
-/**
- * Initialize SuperDate.
- * @param {Boolean} overrideNativeDate Determines whether to override the native Date class.
- */
-module.exports = function initialize(overrideNativeDate=true) {
+const SuperDate = (function initialize(overrideNativeDate=true) {
   const MONTHS_1Y   = 12;
   const MS_1Sec     = 1e3;
   const MS_1Min     = 60 * MS_1Sec;
@@ -16,7 +12,10 @@ module.exports = function initialize(overrideNativeDate=true) {
   /**
    * @param {SuperDate} date
    */
-  const correction = (date) => date.addMs(date.getTimezoneOffset() * MS_1Min);
+  const correction = (date) => {
+    const offset = date.getTimezoneOffset() * MS_1Min;
+    return date.addMs(offset);
+  }
 
   /**
     * `SuperDate` extends the native `Date` object in JavaScript,
@@ -40,24 +39,26 @@ module.exports = function initialize(overrideNativeDate=true) {
             const m = dateMatch[2] || '1';
             const d = dateMatch[3] || '1';
             super(`${y}-${m}-${d} 0:0`);
-            return correction(this);
-          }
-          const timeMatch = TIME_REGEX.exec(args[0]);
-          if (timeMatch) {
-            const h = timeMatch[1];
-            const m = timeMatch[2];
-            const s = timeMatch[3] || '0';
-            const ms = timeMatch[4] || '0';
-            super(`${EPOCH_DATE} ${h}:${m}:${s}.${ms}`);
-            return correction(this);
+          } else {
+            const timeMatch = TIME_REGEX.exec(args[0]);
+            if (timeMatch) {
+              const h = timeMatch[1];
+              const m = timeMatch[2];
+              const s = timeMatch[3] || '0';
+              const ms = timeMatch[4] || '0';
+              super(`${EPOCH_DATE} ${h}:${m}:${s}.${ms}`);
+            } else {
+              super(...args);
+            }
           }
         }
+      } else {
+        super(...args);
       }
-      super(...args);
       return correction(this);
     }
     
-    static Date = Date;
+    static Date = NativeDate;
 
     /**
      * Get timestamp.
@@ -752,4 +753,4 @@ module.exports = function initialize(overrideNativeDate=true) {
 
   if (overrideNativeDate) Date = SuperDate;
   return SuperDate;
-}
+})(true);

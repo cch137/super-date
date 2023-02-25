@@ -1,6 +1,6 @@
 {
   "name": "@cch137/super-date",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "Extend the native JavaScript Date class to provide additional useful functionality.",
   "main": "index.js",
   "scripts": {

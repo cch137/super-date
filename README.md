@@ -29,9 +29,9 @@ If you prefer SuperDate to be a standalone class instead of replacing Date, you 
 const SuperDate = require('@cch137/super-date')(false);
 ```
 
-# Export SuperCode to frontend
+# Export SuperDate to frontend
 
-You can export your SuperCode code for use in the frontend using the following methods. You can also set parameters to decide whether to export the code in minimized form.
+You can export your SuperDate code for use in the frontend using the following methods. You can also set parameters to decide whether to export the code in minimized form.
 
 1.  Export Script
 

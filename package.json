@@ -1,6 +1,6 @@
 {
   "name": "@cch137/super-date",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Extend the native JavaScript Date class to provide additional useful functionality.",
   "main": "index.js",
   "scripts": {
@@ -19,9 +19,5 @@
   "bugs": {
     "url": "https://github.com/cch137/super-date/issues"
   },
-  "homepage": "https://github.com/cch137/super-date#readme",
-  "dependencies": {
-    "@node-minify/core": "^8.0.5",
-    "@node-minify/uglify-js": "^8.0.5"
-  }
+  "homepage": "https://github.com/cch137/super-date#readme"
 }
